@@ -2,7 +2,7 @@ import express, { Application, Request, Response, NextFunction } from "express";
 import dotenv from "dotenv";
 import cors from "cors";
 import morgan from "morgan";
-import emailRoutes from "./routes/emailRoutes";
+import emailRoutes from './routes/emailRoutes.js';
 import contactRoutes from "./routes/contactRoutes";
 import uploadRoutes from "./routes/upload.routes";
 import { connectDB } from "./config/db";
