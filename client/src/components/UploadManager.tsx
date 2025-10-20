@@ -23,7 +23,7 @@ const UploadManager = () => {
   const [newImages, setNewImages] = useState<File[]>([]);
   const [updating, setUpdating] = useState<boolean>(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
-  const apiUrl = import.meta.env.VITE_API_URL;
+  const apiUrl = "https://kesterwebsiteupload-production.up.railway.app/";
 
   const fetchUploads = async () => {
     setLoading(true);
