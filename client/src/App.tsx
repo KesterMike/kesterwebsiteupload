@@ -38,7 +38,7 @@ function App() {
   const [files, setFiles] = useState<File[]>([]);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
-  const apiUrl = "https://kesterwebsiteupload-production.up.railway.app/";
+  const apiUrl = "https://kesterwebsiteupload-production.up.railway.app";
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
     const filesWithPreview = acceptedFiles.map((file) =>
