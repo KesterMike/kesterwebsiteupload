@@ -22,15 +22,14 @@ export async function sendEmail({
   // });
   const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST,
-  port: 587,
-  secure: false,
+  port: 587,          // ✅ use 587 instead of 465
+  secure: false,      // ✅ must be false for STARTTLS
   auth: {
     user: process.env.SMTP_USER,
     pass: process.env.SMTP_PASS,
   },
-  logger: true,
-  debug: true,
 });
+
 
 
   const from = process.env.SMTP_USER;
