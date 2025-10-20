@@ -2,9 +2,9 @@ import express, { Application, Request, Response, NextFunction } from "express";
 import dotenv from "dotenv";
 import cors from "cors";
 import morgan from "morgan";
-import contactRoutes from "./routes/contactRoutes";
-import uploadRoutes from "./routes/upload.routes";
-import emailRoutes from './routes/emailRoutes';
+import contactRoutes from "./routes/ContactRoutes";
+import uploadRoutes from "./routes/Upload.routes";
+import emailRoutes from './routes/EmailRoutes';
 import { connectDB } from "./config/db";
 
 dotenv.config();
