@@ -11,26 +11,15 @@ export async function sendEmail({
   html?: string;
   text?: string;
 }) {
-  // const transporter = nodemailer.createTransport({
-  //   host: process.env.SMTP_HOST,
-  //   port: Number(process.env.SMTP_PORT),
-  //   secure: false,
-  //   auth: {
-  //     user: process.env.SMTP_USER,
-  //     pass: process.env.SMTP_PASS,
-  //   },
-  // });
   const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST,
-  port: 587,          // ✅ use 587 instead of 465
-  secure: false,      // ✅ must be false for STARTTLS
-  auth: {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASS,
-  },
-});
-
-
+    host: process.env.SMTP_HOST,
+    port: Number(process.env.SMTP_PORT),
+    secure: true,
+    auth: {
+      user: process.env.SMTP_USER,
+      pass: process.env.SMTP_PASS,
+    },
+  });
 
   const from = process.env.SMTP_USER;
 
