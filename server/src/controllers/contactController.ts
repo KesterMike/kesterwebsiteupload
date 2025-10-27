@@ -36,6 +36,23 @@ export async function sendContactMessage(req: Request, res: Response) {
   }
 }
 
+// 🗑️ Delete single contact by ID
+export const deleteContactById = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const deleted = await Contact.findByIdAndDelete(id);
+
+    if (!deleted) {
+      return res.status(404).json({ message: "Contact not found" });
+    }
+
+    res.json({ message: "Contact deleted successfully", deleted });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Failed to delete contact", error });
+  }
+};
+
 // Retrieve all contact messages (for admin dashboard)
 export async function getAllContacts(req: Request, res: Response) {
   try {

@@ -16,6 +16,18 @@ interface UploadFormValues {
   solution: string;
 }
 
+interface Contact {
+  _id: string;
+  name: string;
+  email: string;
+  company?: string;
+  phone?: string;
+  referral?: string;
+  interests?: string[];
+  message: string;
+  createdAt: string;
+}
+
 const initialValues: UploadFormValues = {
   title: "",
   description: "",
@@ -38,7 +50,35 @@ function App() {
   const [files, setFiles] = useState<File[]>([]);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
-  const apiUrl = "https://kesterwebsiteupload-production.up.railway.app";
+  const [contacts, setContacts] = useState<Contact[]>([]); // 🔹 store contacts
+  const apiUrl = "https://kesterwebsiteupload-1.onrender.com"; // change to your server URL if deployed
+
+  // 🔹 Fetch contacts from server
+  const fetchContacts = async () => {
+    try {
+      const res = await axios.get(`${apiUrl}/contact`);
+      setContacts(res.data?.data || []);
+    } catch (error) {
+      console.error("Failed to load contacts:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchContacts();
+  }, []);
+
+  // 🗑️ Delete a contact
+  const handleDeleteContact = async (id: string) => {
+    if (!window.confirm("Are you sure you want to delete this message?")) return;
+
+    try {
+      await axios.delete(`${apiUrl}/contact/${id}`);
+      setContacts((prev) => prev.filter((contact) => contact._id !== id));
+    } catch (error) {
+      console.error("Failed to delete contact:", error);
+      alert("❌ Failed to delete contact.");
+    }
+  };
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
     const filesWithPreview = acceptedFiles.map((file) =>
@@ -94,6 +134,57 @@ function App() {
         Kester Studios Uploads
       </h1>
 
+      {/* 🔹 CONTACTS SECTION */}
+      <div className="bg-white rounded-3xl shadow-2xl p-8 max-w-4xl w-full mb-10">
+  <h2 className="text-2xl font-semibold text-gray-700 mb-4">
+    📬 Received Contacts
+  </h2>
+
+  {contacts.length === 0 ? (
+    <p className="text-gray-500">No contact messages yet.</p>
+  ) : (
+    <div className="space-y-4 max-h-96 overflow-y-auto">
+      {contacts.map((contact) => (
+        <div
+          key={contact._id}
+          className="p-4 border rounded-lg shadow-sm bg-gray-50 hover:bg-gray-100 transition flex justify-between items-start"
+        >
+          <div>
+            <p className="font-bold text-gray-800">{contact.name}</p>
+            <p className="text-sm text-gray-600">
+              {contact.email} {contact.phone && `• ${contact.phone}`}
+            </p>
+            <p className="text-gray-700 mt-2">{contact.message}</p>
+            {contact.company && (
+              <p className="text-sm text-gray-500 mt-1">
+                Company: {contact.company}
+              </p>
+            )}
+            {contact.interests && contact.interests.length > 0 && (
+              <p className="text-sm text-gray-500 mt-1">
+                Interests: {contact.interests.join(", ")}
+              </p>
+            )}
+            <p className="text-xs text-gray-400 mt-2">
+              Sent on: {new Date(contact.createdAt).toLocaleString()}
+            </p>
+          </div>
+
+          {/* 🗑️ Delete Button */}
+          <button
+            onClick={() => handleDeleteContact(contact._id)}
+            className="ml-4 text-red-500 hover:text-red-700 font-bold text-sm transition"
+            title="Delete message"
+          >
+            ✕
+          </button>
+        </div>
+      ))}
+    </div>
+  )}
+</div>
+
+      {/* 🔹 UPLOAD FORM */}
       <Formik
         initialValues={initialValues}
         validationSchema={UploadSchema}

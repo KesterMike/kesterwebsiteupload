@@ -3,18 +3,21 @@ import {
   sendContactMessage,
   getAllContacts,
   getContactById,
+  deleteContactById, // 👈 new import
 } from "../controllers/contactController";
 
 const router = Router();
 
-// Save new contact message
+// 📨 Save new contact message
 router.post("/contact", sendContactMessage);
 
-// Get all contact messages
+// 📋 Get all contact messages
 router.get("/contact", getAllContacts);
 
-// Get a single contact message by ID
+// 🔍 Get a single contact message by ID
 router.get("/contact/:id", getContactById);
 
-export default router;
+// 🗑️ Delete a specific contact message
+router.delete("/contact/:id", deleteContactById);
 
+export default router;
