@@ -47,13 +47,34 @@ const UploadSchema = Yup.object().shape({
 });
 
 function App() {
+  // 🔒 Session login overlay
+  const [isAuthorized, setIsAuthorized] = useState(false);
+  const [enteredPassword, setEnteredPassword] = useState("");
+  const [error, setError] = useState("");
+  const ENV_PASSWORD = import.meta.env.VITE_APP_PASSWORD;
+
+  useEffect(() => {
+    const sessionAuth = sessionStorage.getItem("authorized");
+    if (sessionAuth === "true") setIsAuthorized(true);
+  }, []);
+
+  const handlePasswordSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (enteredPassword === ENV_PASSWORD) {
+      setIsAuthorized(true);
+      sessionStorage.setItem("authorized", "true");
+    } else {
+      setError("Invalid password");
+    }
+  };
+
+  // 🧩 App states
   const [files, setFiles] = useState<File[]>([]);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
-  const [contacts, setContacts] = useState<Contact[]>([]); // 🔹 store contacts
-  const apiUrl = "https://kesterwebsiteupload-1.onrender.com"; // change to your server URL if deployed
+  const [contacts, setContacts] = useState<Contact[]>([]);
+  const apiUrl = "https://kesterwebsiteupload-1.onrender.com";
 
-  // 🔹 Fetch contacts from server
   const fetchContacts = async () => {
     try {
       const res = await axios.get(`${apiUrl}/contact`);
@@ -67,7 +88,6 @@ function App() {
     fetchContacts();
   }, []);
 
-  // 🗑️ Delete a contact
   const handleDeleteContact = async (id: string) => {
     if (!window.confirm("Are you sure you want to delete this message?")) return;
 
@@ -82,9 +102,7 @@ function App() {
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
     const filesWithPreview = acceptedFiles.map((file) =>
-      Object.assign(file, {
-        preview: URL.createObjectURL(file),
-      })
+      Object.assign(file, { preview: URL.createObjectURL(file) })
     );
     setFiles(filesWithPreview);
   }, []);
@@ -129,62 +147,88 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-tr from-gray-100 to-gray-200 flex flex-col items-center justify-center p-6">
+    <div className="relative min-h-screen bg-gradient-to-tr from-gray-100 to-gray-200 flex flex-col items-center justify-center p-6">
+
+      {/* 🔒 Fixed Centered Overlay for session login */}
+      {!isAuthorized && (
+        <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-gray-900 bg-opacity-95 z-50">
+          <div className="bg-white rounded-2xl p-8 shadow-2xl text-center max-w-sm w-full mx-4">
+            <h2 className="text-2xl font-bold text-gray-800 mb-4">
+              🔐 Admin Access
+            </h2>
+            <form onSubmit={handlePasswordSubmit} className="space-y-4">
+              <input
+                type="password"
+                value={enteredPassword}
+                onChange={(e) => setEnteredPassword(e.target.value)}
+                placeholder="Enter password"
+                className="px-4 py-2 rounded-md w-full border focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+              />
+              <button
+                type="submit"
+                className="w-full py-2 bg-indigo-500 text-white font-semibold rounded-md hover:bg-indigo-600 transition"
+              >
+                Unlock
+              </button>
+            </form>
+            {error && <p className="text-red-500 mt-3">{error}</p>}
+          </div>
+        </div>
+      )}
+
+      {/* MAIN APP CONTENT */}
       <h1 className="text-4xl font-extrabold text-center text-gray-700 mb-8 tracking-tight">
         Kester Studios Uploads
       </h1>
 
-      {/* 🔹 CONTACTS SECTION */}
+      {/* CONTACTS SECTION */}
       <div className="bg-white rounded-3xl shadow-2xl p-8 max-w-4xl w-full mb-10">
-  <h2 className="text-2xl font-semibold text-gray-700 mb-4">
-    📬 Received Contacts
-  </h2>
-
-  {contacts.length === 0 ? (
-    <p className="text-gray-500">No contact messages yet.</p>
-  ) : (
-    <div className="space-y-4 max-h-96 overflow-y-auto">
-      {contacts.map((contact) => (
-        <div
-          key={contact._id}
-          className="p-4 border rounded-lg shadow-sm bg-gray-50 hover:bg-gray-100 transition flex justify-between items-start"
-        >
-          <div>
-            <p className="font-bold text-gray-800">{contact.name}</p>
-            <p className="text-sm text-gray-600">
-              {contact.email} {contact.phone && `• ${contact.phone}`}
-            </p>
-            <p className="text-gray-700 mt-2">{contact.message}</p>
-            {contact.company && (
-              <p className="text-sm text-gray-500 mt-1">
-                Company: {contact.company}
-              </p>
-            )}
-            {contact.interests && contact.interests.length > 0 && (
-              <p className="text-sm text-gray-500 mt-1">
-                Interests: {contact.interests.join(", ")}
-              </p>
-            )}
-            <p className="text-xs text-gray-400 mt-2">
-              Sent on: {new Date(contact.createdAt).toLocaleString()}
-            </p>
+        <h2 className="text-2xl font-semibold text-gray-700 mb-4">
+          📬 Received Contacts
+        </h2>
+        {contacts.length === 0 ? (
+          <p className="text-gray-500">No contact messages yet.</p>
+        ) : (
+          <div className="space-y-4 max-h-96 overflow-y-auto">
+            {contacts.map((contact) => (
+              <div
+                key={contact._id}
+                className="p-4 border rounded-lg shadow-sm bg-gray-50 hover:bg-gray-100 transition flex justify-between items-start"
+              >
+                <div>
+                  <p className="font-bold text-gray-800">{contact.name}</p>
+                  <p className="text-sm text-gray-600">
+                    {contact.email} {contact.phone && `• ${contact.phone}`}
+                  </p>
+                  <p className="text-gray-700 mt-2">{contact.message}</p>
+                  {contact.company && (
+                    <p className="text-sm text-gray-500 mt-1">
+                      Company: {contact.company}
+                    </p>
+                  )}
+                  {contact.interests && contact.interests.length > 0 && (
+                    <p className="text-sm text-gray-500 mt-1">
+                      Interests: {contact.interests.join(", ")}
+                    </p>
+                  )}
+                  <p className="text-xs text-gray-400 mt-2">
+                    Sent on: {new Date(contact.createdAt).toLocaleString()}
+                  </p>
+                </div>
+                <button
+                  onClick={() => handleDeleteContact(contact._id)}
+                  className="ml-4 text-red-500 hover:text-red-700 font-bold text-sm transition"
+                  title="Delete message"
+                >
+                  ✕
+                </button>
+              </div>
+            ))}
           </div>
+        )}
+      </div>
 
-          {/* 🗑️ Delete Button */}
-          <button
-            onClick={() => handleDeleteContact(contact._id)}
-            className="ml-4 text-red-500 hover:text-red-700 font-bold text-sm transition"
-            title="Delete message"
-          >
-            ✕
-          </button>
-        </div>
-      ))}
-    </div>
-  )}
-</div>
-
-      {/* 🔹 UPLOAD FORM */}
+      {/* UPLOAD FORM SECTION */}
       <Formik
         initialValues={initialValues}
         validationSchema={UploadSchema}
@@ -192,7 +236,6 @@ function App() {
       >
         {() => (
           <Form className="bg-white rounded-3xl shadow-2xl p-10 max-w-2xl w-full space-y-6">
-            {/* Dropzone */}
             <div
               {...getRootProps()}
               className={`rounded-2xl border-2 border-dashed p-8 text-center cursor-pointer transition-all duration-300 ${
@@ -225,21 +268,12 @@ function App() {
               )}
             </div>
 
-            {/* Form Inputs */}
+            {/* Inputs */}
             <div className="grid grid-cols-1 gap-5">
               <div>
-                <Field
-                  name="title"
-                  placeholder="Image Title"
-                  className="input-field"
-                />
-                <ErrorMessage
-                  name="title"
-                  component="div"
-                  className="error-text"
-                />
+                <Field name="title" placeholder="Image Title" className="input-field" />
+                <ErrorMessage name="title" component="div" className="error-text" />
               </div>
-
               <div>
                 <Field
                   as="textarea"
@@ -248,26 +282,12 @@ function App() {
                   rows={3}
                   className="input-field resize-none"
                 />
-                <ErrorMessage
-                  name="description"
-                  component="div"
-                  className="error-text"
-                />
+                <ErrorMessage name="description" component="div" className="error-text" />
               </div>
-
               <div>
-                <Field
-                  name="tags"
-                  placeholder="Tags (comma separated)"
-                  className="input-field"
-                />
-                <ErrorMessage
-                  name="tags"
-                  component="div"
-                  className="error-text"
-                />
+                <Field name="tags" placeholder="Tags (comma separated)" className="input-field" />
+                <ErrorMessage name="tags" component="div" className="error-text" />
               </div>
-
               <div>
                 <Field
                   as="textarea"
@@ -276,13 +296,8 @@ function App() {
                   rows={3}
                   className="input-field resize-none"
                 />
-                <ErrorMessage
-                  name="problem"
-                  component="div"
-                  className="error-text"
-                />
+                <ErrorMessage name="problem" component="div" className="error-text" />
               </div>
-
               <div>
                 <Field
                   as="textarea"
@@ -291,35 +306,22 @@ function App() {
                   rows={3}
                   className="input-field resize-none"
                 />
-                <ErrorMessage
-                  name="solution"
-                  component="div"
-                  className="error-text"
-                />
+                <ErrorMessage name="solution" component="div" className="error-text" />
               </div>
-
               <div>
                 <Field as="select" name="category" className="input-field">
                   <option value="">Select Category</option>
                   <option value="UI/UX">UI/UX</option>
-                  <option value="Blockchain Development">
-                    Blockchain Development
-                  </option>
+                  <option value="Blockchain Development">Blockchain Development</option>
                   <option value="Web Development">Web Development</option>
                   <option value="2D/3D design">2D/3D Design</option>
                   <option value="Game Development">Game Development</option>
                   <option value="App Development">App Development</option>
                 </Field>
-
-                <ErrorMessage
-                  name="category"
-                  component="div"
-                  className="error-text"
-                />
+                <ErrorMessage name="category" component="div" className="error-text" />
               </div>
             </div>
 
-            {/* Submit */}
             <button
               type="submit"
               className={`w-full py-3 text-white font-bold rounded-lg shadow-md transition-all ${
@@ -331,7 +333,6 @@ function App() {
             >
               {loading ? "Uploading..." : "Upload Media"}
             </button>
-
             {message && (
               <p className="text-center text-sm text-gray-600">{message}</p>
             )}
