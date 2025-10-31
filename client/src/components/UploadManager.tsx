@@ -42,7 +42,7 @@ const UploadManager = () => {
     if (deletingId) return;
     setDeletingId(id);
     try {
-      await axios.delete(`${apiUrl}uploads/${id}`);
+      await axios.delete(`${apiUrl}/uploads/${id}`);
       setUploads((prev) => prev.filter((u) => u._id !== id));
     } catch (err) {
       alert("Failed to delete upload.");
