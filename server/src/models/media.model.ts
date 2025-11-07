@@ -14,6 +14,7 @@ export interface IMedia extends Document {
   images: string[];
   problem: string;
   solution: string;
+  link: string;
 }
 
 const mediaSchema = new Schema<IMedia>(
@@ -36,6 +37,7 @@ const mediaSchema = new Schema<IMedia>(
     images: { type: [String], required: true },
     problem: { type: String, required: true },
     solution: { type: String, required: true },
+    link: { type: String, required: true },
   },
   { timestamps: true }
 );
