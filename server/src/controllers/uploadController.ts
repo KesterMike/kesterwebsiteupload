@@ -7,7 +7,7 @@ import { unlinkSync } from "fs";
 // ✅ UPLOAD MEDIA
 export const uploadMedia = async (req: Request, res: Response) => {
   try {
-    const { title, description, tags, category, problem, solution } = req.body;
+    const { title, description, tags, category, problem, solution, link } = req.body;
     const files = req.files as Express.Multer.File[];
 
     if (!files || files.length === 0) {
@@ -27,6 +27,7 @@ export const uploadMedia = async (req: Request, res: Response) => {
       category,
       problem,
       solution,
+      link,
       images: imageUrls,
     });
 
@@ -66,7 +67,7 @@ export const deleteUpload = async (req: Request, res: Response) => {
 // ✅ EDIT UPLOAD
 export const editUpload = async (req: Request, res: Response) => {
   try {
-    const { title, description, category, problem, solution, tags } = req.body;
+    const { title, description, category, problem, solution, link, tags } = req.body;
     const existingImages = req.body.existingImages || [];
     const parsedTags = typeof tags === "string" ? JSON.parse(tags) : tags;
 
@@ -100,6 +101,7 @@ export const editUpload = async (req: Request, res: Response) => {
         tags: parsedTags,
         problem,
         solution,
+        link,
         images: allImages,
       },
       { new: true }
