@@ -161,6 +161,9 @@ const UploadManager = () => {
                   <p className="text-sm">
                     <strong>Solution:</strong> {upload.solution}
                   </p>
+                  <p className="text-sm">
+                    <strong>Link:</strong> {upload.link}
+                  </p>
                   <p className="text-xs text-gray-400 mt-2">
                     Created: {new Date(upload.createdAt).toLocaleString()}
                   </p>
@@ -264,6 +267,15 @@ const UploadManager = () => {
                 value={formData.solution || ""}
                 onChange={(e) =>
                   setFormData((prev) => ({ ...prev, solution: e.target.value }))
+                }
+              />
+              <textarea
+                className="input-field"
+                placeholder="Link"
+                rows={1}
+                value={formData.link || ""}
+                onChange={(e) =>
+                  setFormData((prev) => ({ ...prev, link: e.target.value }))
                 }
               />
 
