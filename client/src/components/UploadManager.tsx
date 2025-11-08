@@ -98,7 +98,7 @@ const UploadManager = () => {
     data.append("category", formData.category || "");
     data.append("problem", formData.problem || "");
     data.append("solution", formData.solution || "");
-    data.append("link", formData.solution || "");
+    data.append("link", formData.link || "");
     data.append("tags", JSON.stringify(formData.tags || []));
 
     try {
