@@ -37,7 +37,7 @@ const mediaSchema = new Schema<IMedia>(
     images: { type: [String], required: true },
     problem: { type: String, required: true },
     solution: { type: String, required: true },
-    link: { type: String, required: true },
+    link: { type: String, default: "" },
   },
   { timestamps: true }
 );
