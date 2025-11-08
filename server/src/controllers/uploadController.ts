@@ -4,7 +4,6 @@ import cloudinary from "../utils/cloudinary";
 import Media from "../models/media.model";
 import { unlinkSync } from "fs";
 
-// ✅ UPLOAD MEDIA
 export const uploadMedia = async (req: Request, res: Response) => {
   try {
     const { title, description, tags, category, problem, solution, link } = req.body;
@@ -14,16 +13,23 @@ export const uploadMedia = async (req: Request, res: Response) => {
       return res.status(400).json({ message: "No images uploaded." });
     }
 
-    const uploadPromises = files.map((file) =>
-      cloudinary.uploader.upload(file.path, { folder: "media-uploads" })
+    // ✅ Fix tag formatting
+    let formattedTags: string[] = [];
+    if (typeof tags === "string") {
+      formattedTags = tags.split(",").map((tag: string) => tag.trim());
+    } else if (Array.isArray(tags)) {
+      formattedTags = tags;
+    }
+
+    const uploadResults = await Promise.all(
+      files.map((file) => cloudinary.uploader.upload(file.path, { folder: "media-uploads" }))
     );
-    const uploadResults = await Promise.all(uploadPromises);
     const imageUrls = uploadResults.map((result) => result.secure_url);
 
     const newMedia = await Media.create({
       title,
       description,
-      tags: tags.split(",").map((tag: string) => tag.trim()),
+      tags: formattedTags,
       category,
       problem,
       solution,
@@ -32,11 +38,13 @@ export const uploadMedia = async (req: Request, res: Response) => {
     });
 
     res.status(201).json({ message: "Upload successful!", data: newMedia });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Server Error" });
+
+  } catch (error: any) {
+    console.error("UPLOAD ERROR:", error.message); // ✅ log actual reason
+    res.status(500).json({ message: "Server Error", error: error.message });
   }
 };
+
 
 // ✅ GET SINGLE UPLOAD
 export const getSingleUpload = async (req: Request, res: Response) => {
