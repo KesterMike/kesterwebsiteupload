@@ -318,6 +318,7 @@ function App() {
                   rows={1}
                   className="input-field resize-none"
                 />
+                <ErrorMessage name="link" component="div" className="error-text" />
               </div>
               <div>
                 <Field as="select" name="category" className="input-field">
