@@ -14,6 +14,7 @@ interface UploadFormValues {
   category: string;
   problem: string;
   solution: string;
+  link: string;
 }
 
 interface Contact {
@@ -35,6 +36,7 @@ const initialValues: UploadFormValues = {
   category: "",
   problem: "",
   solution: "",
+  link: "",
 };
 
 const UploadSchema = Yup.object().shape({
@@ -44,6 +46,7 @@ const UploadSchema = Yup.object().shape({
   category: Yup.string().required("Category is required"),
   problem: Yup.string().required("Problem is required"),
   solution: Yup.string().required("Solution is required"),
+  link: Yup.string().required("Link is required"),
 });
 
 function App() {
@@ -306,7 +309,15 @@ function App() {
                   rows={3}
                   className="input-field resize-none"
                 />
+                
                 <ErrorMessage name="solution" component="div" className="error-text" />
+                <Field
+                  as="textarea"
+                  name="link"
+                  placeholder="Drop link here"
+                  rows={1}
+                  className="input-field resize-none"
+                />
               </div>
               <div>
                 <Field as="select" name="category" className="input-field">
