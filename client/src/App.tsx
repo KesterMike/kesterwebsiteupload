@@ -76,7 +76,7 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [contacts, setContacts] = useState<Contact[]>([]);
-  const apiUrl = "https://kesterwebsiteupload-1.onrender.com";
+  const apiUrl = "https://kesterwebsiteupload-production.up.railway.app";
 
   const fetchContacts = async () => {
     try {
